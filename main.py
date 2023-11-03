@@ -13,7 +13,15 @@ screen_width = 1080
 screen_height = 720
 screen = pygame.display.set_mode((screen_width, screen_height))
 
-sub_game_flag = 1
+intro_image = pygame.image.load('resource/intro.png')
+blue_win_image = pygame.image.load('resource/bluewin.png')
+red_win_image = pygame.image.load('resource/redwin.png')
+red_vic_image = pygame.image.load('resource/redvic.png')
+blue_vic_image = pygame.image.load('resource/bluevic.png')
+
+sub_game_flag = 0
+redwin = 0
+bluewin = 0
 
 # 배경 이미지 로드
 background = pygame.image.load('resource/field.jpg')
@@ -115,7 +123,9 @@ marker2 = [0, (715, 515), 1]
 markable = []
 # 말 설정
 marker1_color = (255, 0, 0)  # 버튼의 색상, 여기서는 빨간색
+marker1_image = pygame.image.load('resource/marker1.png')
 marker2_color = (0, 0, 255)  # 버튼의 색상, 여기서는 파란색
+marker2_image = pygame.image.load('resource/marker2.png')
 # 말의 위치를 업데이트하는 함수
 def update_marker(marker, node):
     marker[0] = node
@@ -295,21 +305,20 @@ def main_stream(score1, score2):
 
     # 말 그리기
     if marker1[0] != -1:
-        pygame.draw.circle(screen, marker1_color, (marker1[1][0] - 5, marker1[1][1] - 5), 15)
+        screen.blit(marker1_image, (marker1[1][0] - 25, marker1[1][1] - 25))
     else:
-        score1 += 1
+        redwin = 1
     if marker2[0] != -1:
-        pygame.draw.circle(screen, marker2_color, (marker2[1][0] + 5, marker2[1][1] + 5), 15)
+        screen.blit(marker2_image, (marker2[1][0] - 35, marker2[1][1] - 35))
     else:
-        score2 += 1
-
+        bluewin = 1
+intro = 1
 # 게임 루프
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
         # 마우스 버튼이 눌렸는지 확인
         elif event.type == pygame.MOUSEBUTTONDOWN:
             # 현재 플레이어의 btn_press 단계에서만 버튼 클릭을 처리
@@ -342,6 +351,7 @@ while running:
     if marker1[0] != 0 and marker1[0] == marker2[0]:
 
         ran = random.random()
+        sub_game_flag = 0
         if ran >= 0.5:
             winner = tabtab()
         elif ran >= 0.25:
@@ -352,13 +362,44 @@ while running:
         if winner == 2:
             marker1[0] = 0
             marker1[1] = node_ranges[0]
+            screen.blit(blue_win_image, (0, 0))
         elif winner == 1:
             marker2[0] = 0
             marker2[1] = node_ranges[0]
-        sub_game_flag = 0
+            screen.blit(red_win_image, (0, 0))
+        sub_game_flag = 1
 
+    if marker1[0] == -1:
+        screen.blit(red_vic_image, (0,0))
+    elif marker2[0] == -1:
+        screen.blit(blue_vic_image, (0,0))
+
+
+    if intro == 1:
+        screen.blit(intro_image, (0,0))
     # 화면 업데이트
     pygame.display.update()
+
+    if intro == 1:
+        screen.blit(intro_image, (0,0))
+        pygame.time.delay(2000)
+        intro = 0
+
+    if marker1[0] == -1:
+        pygame.time.delay(3000)
+        break
+    elif marker2[0] == -1:
+        pygame.time.delay(3000)
+        break
+
+
+    if sub_game_flag == 1:
+        pygame.time.delay(3000)
+        sub_game_flag = 0
+
+
+
+
 
 
 # Pygame 종료
